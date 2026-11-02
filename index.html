@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tippie Thrive: Where Does Time Go?</title>
-    <script src="https://jsdelivr.net"></script>
     <style>
         :root {
             --tippie-gold: #FFCD00;
             --tippie-black: #000000;
             --dark-gray: #1e1e1e;
+            --light-gray: #f4f4f6;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tippie-black);
-            color: #ffffff;
+            background-color: #ffffff;
+            color: var(--tippie-black);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -24,31 +24,39 @@
         .container {
             max-width: 500px;
             width: 100%;
-            background: var(--dark-gray);
+            background: var(--light-gray);
             padding: 20px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             box-sizing: border-box;
         }
         h1 {
-            color: var(--tippie-gold);
+            color: var(--tippie-black);
             font-size: 24px;
             text-align: center;
             margin-top: 0;
             margin-bottom: 5px;
+            font-weight: 800;
         }
         h2 {
             font-size: 14px;
             text-align: center;
-            color: #aaaaaa;
+            color: #555555;
             margin-bottom: 25px;
-            font-weight: 400;
+            font-weight: 500;
         }
         .chart-box {
-            position: relative;
-            margin: 0 auto 25px auto;
-            height: 220px;
-            width: 220px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .pie-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(#36A2EB 0%, #36A2EB 100%);
+            transition: background 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
         .slider-group {
             margin-bottom: 18px;
@@ -63,7 +71,7 @@
         input[type=range] {
             width: 100%;
             -webkit-appearance: none;
-            background: #333;
+            background: #dddddd;
             height: 8px;
             border-radius: 4px;
             outline: none;
@@ -74,7 +82,8 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: var(--tippie-gold);
+            background: var(--tippie-black);
+            border: 2px solid var(--tippie-gold);
             cursor: pointer;
         }
         .status-box {
@@ -85,8 +94,8 @@
             border-radius: 8px;
             margin-top: 10px;
         }
-        .normal { background: #1b4332; color: #75e6da; }
-        .over { background: #641e16; color: #f1948a; }
+        .normal { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .over { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
@@ -96,7 +105,7 @@
     <h2>Daily Time Budget Auditing Tool</h2>
     
     <div class="chart-box">
-        <canvas id="timeChart"></canvas>
+        <div id="pieChart" class="pie-chart"></div>
     </div>
 
     <div id="slidersContainer"></div>
@@ -106,10 +115,14 @@
 <script>
     const categories = [
         { id: 'sleep', name: '🛏️ Sleep', val: 8, color: '#36A2EB' },
-        { id: 'class', name: '🏫 Classes & Commute', val: 4, color: '#FFCE56' },
-        { id: 'study', name: '📚 Studying & Homework', val: 4, color: '#4BC0C0' },
+        { id: 'class', name: '🏫 Classes & Lectures', val: 4, color: '#FFCE56' },
+        { id: 'study', name: '📚 Studying & Homework', val: 3, color: '#4BC0C0' },
         { id: 'work', name: '💼 Job & Student Orgs', val: 2, color: '#9966FF' },
-        { id: 'meals', name: '🍕 Meals & Self-Care', val: 2, color: '#FF9F40' }
+        { id: 'commute', name: '🚶 Walking & Commute', val: 1, color: '#E74C3C' },
+        { id: 'ready', name: '🚿 Getting Ready (Morning/Night)', val: 1, color: '#F1948A' },
+        { id: 'meals', name: '🍕 Meals & Nutrition', val: 2, color: '#FF9F40' },
+        { id: 'selfcare', name: '🧘 Self-Care & Mental Wellness', val: 1, color: '#A569BD' },
+        { id: 'misc', name: '⚙️ Miscellaneous / Other', val: 0, color: '#7F8C8D' }
     ];
 
     const container = document.getElementById('slidersContainer');
@@ -125,47 +138,43 @@
         `;
     });
 
-    const ctx = document.getElementById('timeChart').getContext('2d');
-    let timeChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: [...categories.map(c => c.name.split(' ')[1]), 'Free Time'],
-            datasets: [{
-                data: [...categories.map(c => c.val), 4],
-                backgroundColor: [...categories.map(c => c.color), '#2ecc71'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
-    });
-
     function updateTime() {
         let totalUsed = 0;
-        categories.forEach((cat, index) => {
+        let slices = [];
+        let currentAngle = 0;
+
+        categories.forEach(cat => {
             const val = parseFloat(document.getElementById(cat.id).value);
             document.getElementById(`${cat.id}-val`).innerText = val + ' hrs';
-            timeChart.data.datasets[0].data[index] = val;
             totalUsed += val;
+
+            if (val > 0) {
+                const nextAngle = currentAngle + (val / 24) * 360;
+                slices.push(`${cat.color} ${currentAngle}deg ${nextAngle}deg`);
+                currentAngle = nextAngle;
+            }
         });
 
         const remaining = 24 - totalUsed;
         const statusEl = document.getElementById('status');
+        const pieEl = document.getElementById('pieChart');
 
         if (remaining >= 0) {
-            timeChart.data.datasets[0].data[categories.length] = remaining;
-            timeChart.data.datasets[0].backgroundColor[categories.length] = '#2ecc71';
+            if (remaining > 0) {
+                slices.push(`#2ecc71 ${currentAngle}deg 360deg`);
+            }
             statusEl.innerText = `🎉 Remaining Free Time: ${remaining} hours`;
             statusEl.className = "status-box normal";
         } else {
-            timeChart.data.datasets[0].data[categories.length] = 0;
             statusEl.innerText = `⚠️ Over Budget by ${Math.abs(remaining)} hours! (Total: ${totalUsed}/24)`;
             statusEl.className = "status-box over";
         }
-        timeChart.update();
+
+        if (slices.length > 0) {
+            pieEl.style.background = `conic-gradient(${slices.join(', ')})`;
+        } else {
+            pieEl.style.background = '#e0e0e0';
+        }
     }
     updateTime();
 </script>
