@@ -138,24 +138,10 @@
 
     const container = document.getElementById('slidersContainer');
     categories.forEach(cat => {
-        container.innerHTML += `
-            <div class="slider-group">
-                <div class="slider-label">
-                    <span class="label-text">
-                        <span class="color-dot" style="background-color: ${cat.color};"></span>
-                        ${cat.name}
-                    </span>
-                    <span id="${cat.id}-val">${cat.val} hrs</span>
-                </div>
-                <input type="range" id="${cat.id}" min="0" max="24" step="0.5" value="${cat.val}" oninput="updateTime()">
-            </div>
-        `;
+        container.innerHTML += '<div class="slider-group"><div class="slider-label"><span class="label-text"><span class="color-dot" style="background-color: ' + cat.color + ';"></span>' + cat.name + '</span><span id="' + cat.id + '-val">' + cat.val + ' hrs</span></div><input type="range" id="' + cat.id + '" min="0" max="24" step="0.5" value="' + cat.val + '" oninput="updateTime()"></div>';
         
         const style = document.createElement('style');
-        style.innerHTML = `
-            #${cat.id}::-webkit-slider-thumb { background: ${cat.color} !important; }
-            #${cat.id}::-moz-range-thumb { background: ${cat.color} !important; }
-        `;
+        style.innerHTML = '#' + cat.id + '::-webkit-slider-thumb { background: ' + cat.color + ' !important; } #' + cat.id + '::-moz-range-thumb { background: ' + cat.color + ' !important; }';
         document.head.appendChild(style);
     });
 
@@ -166,12 +152,12 @@
 
         categories.forEach(cat => {
             const val = parseFloat(document.getElementById(cat.id).value);
-            document.getElementById(`${cat.id}-val`).innerText = val + ' hrs';
+            document.getElementById(cat.id + '-val').innerText = val + ' hrs';
             totalUsed += val;
 
             if (val > 0) {
                 const nextAngle = currentAngle + (val / 24) * 360;
-                slices.push(`${cat.color} ${currentAngle}deg ${nextAngle}deg`);
+                slices.push(cat.color + ' ' + currentAngle + 'deg ' + nextAngle + 'deg');
                 currentAngle = nextAngle;
             }
         });
@@ -182,17 +168,17 @@
 
         if (remaining >= 0) {
             if (remaining > 0) {
-                slices.push(`#2ecc71 ${currentAngle}deg 360deg`);
+                slices.push('#2ecc71 ' + currentAngle + 'deg 360deg');
             }
-            statusEl.innerText = `🎉 Remaining Free Time: ${remaining} hours`;
+            statusEl.innerText = '🎉 Remaining Free Time: ' + remaining + ' hours';
             statusEl.className = "status-box normal";
         } else {
-            statusEl.innerText = `⚠️ Over Budget by ${Math.abs(remaining)} hours! (Total: ${totalUsed}/24)`;
+            statusEl.innerText = '⚠️ Over Budget by ' + Math.abs(remaining) + ' hours! (Total: ' + totalUsed + '/24)';
             statusEl.className = "status-box over";
         }
 
         if (slices.length > 0) {
-            pieEl.style.background = `conic-gradient(${slices.join(', ')})`;
+            pieEl.style.background = 'conic-gradient(' + slices.join(', ') + ')';
         } else {
             pieEl.style.background = '#e0e0e0';
         }
