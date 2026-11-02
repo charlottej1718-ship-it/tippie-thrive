@@ -8,7 +8,6 @@
         :root {
             --tippie-gold: #FFCD00;
             --tippie-black: #000000;
-            --dark-gray: #1e1e1e;
             --light-gray: #f4f4f6;
         }
         body {
@@ -54,7 +53,7 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
-            background: conic-gradient(#36A2EB 0%, #36A2EB 100%);
+            background: #e0e0e0;
             transition: background 0.2s ease;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
@@ -68,6 +67,17 @@
             margin-bottom: 6px;
             font-weight: 600;
         }
+        .label-text {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
         input[type=range] {
             width: 100%;
             -webkit-appearance: none;
@@ -76,15 +86,16 @@
             border-radius: 4px;
             outline: none;
         }
+        /* Custom dynamic slider thumb colors applied via Javascript below */
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: var(--tippie-black);
-            border: 2px solid var(--tippie-gold);
             cursor: pointer;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.3);
         }
         .status-box {
             text-align: center;
@@ -115,13 +126,14 @@
 <script>
     const categories = [
         { id: 'sleep', name: '🛏️ Sleep', val: 8, color: '#36A2EB' },
-        { id: 'class', name: '🏫 Classes & Lectures', val: 4, color: '#FFCE56' },
+        { id: 'class', name: '🏫 Classes', val: 4, color: '#FFCE56' },
         { id: 'study', name: '📚 Studying & Homework', val: 3, color: '#4BC0C0' },
         { id: 'work', name: '💼 Job & Student Orgs', val: 2, color: '#9966FF' },
-        { id: 'commute', name: '🚶 Walking & Commute', val: 1, color: '#E74C3C' },
-        { id: 'ready', name: '🚿 Getting Ready (Morning/Night)', val: 1, color: '#F1948A' },
+        { id: 'commute', name: '🚗 Commute (walking and driving)', val: 1, color: '#E74C3C' },
+        { id: 'ready', name: '🚿 Getting Ready (getting ready for the day)', val: 1, color: '#F1948A' },
         { id: 'meals', name: '🍕 Meals & Nutrition', val: 2, color: '#FF9F40' },
-        { id: 'selfcare', name: '🧘 Self-Care & Mental Wellness', val: 1, color: '#A569BD' },
+        { id: 'social', name: '👥 Socializing', val: 1, color: '#34495E' },
+        { id: 'downtime', name: '📱 Downtime (TV or phone scrolling)', val: 2, color: '#1ABC9C' },
         { id: 'misc', name: '⚙️ Miscellaneous / Other', val: 0, color: '#7F8C8D' }
     ];
 
@@ -130,12 +142,23 @@
         container.innerHTML += `
             <div class="slider-group">
                 <div class="slider-label">
-                    <span>${cat.name}</span>
+                    <span class="label-text">
+                        <span class="color-dot" style="background-color: ${cat.color};"></span>
+                        ${cat.name}
+                    </span>
                     <span id="${cat.id}-val">${cat.val} hrs</span>
                 </div>
                 <input type="range" id="${cat.id}" min="0" max="24" step="0.5" value="${cat.val}" oninput="updateTime()">
             </div>
         `;
+        
+        // Dynamic thumb coloring style injection
+        const style = document.createElement('style');
+        style.innerHTML = `
+            #${cat.id}::-webkit-slider-thumb { background: ${cat.color} !important; }
+            #${cat.id}::-moz-range-thumb { background: ${cat.color} !important; }
+        `;
+        document.head.appendChild(style);
     });
 
     function updateTime() {
