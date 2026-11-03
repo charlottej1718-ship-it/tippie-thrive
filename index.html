@@ -124,22 +124,22 @@
 
 <script>
     const categories = [
-        { id: 'sleep', name: '🛏️ Sleep', val: 8, color: '#36A2EB' },
-        { id: 'class', name: '🏫 Classes', val: 4, color: '#FFCE56' },
-        { id: 'study', name: '📚 Studying & Homework', val: 3, color: '#4BC0C0' },
-        { id: 'work', name: '💼 Job', val: 2, color: '#9966FF' },
-        { id: 'studentorgs', name: '📣 Student Orgs & Clubs', val: 1, color: '#9B59B6' },
-        { id: 'commute', name: '🚗 Commute (walking and driving)', val: 1, color: '#E74C3C' },
-        { id: 'ready', name: '🚿 Getting Ready (getting ready for the day)', val: 1, color: '#F1948A' },
-        { id: 'meals', name: '🍕 Meals & Nutrition', val: 2, color: '#FF9F40' },
-        { id: 'social', name: '👥 Socializing', val: 1, color: '#34495E' },
-        { id: 'downtime', name: '📱 Downtime (TV or phone scrolling)', val: 2, color: '#1ABC9C' },
+        { id: 'sleep', name: '🛏️ Sleep', val: 0, color: '#36A2EB' },
+        { id: 'class', name: '🏫 Classes', val: 0, color: '#FFCE56' },
+        { id: 'study', name: '📚 Studying & Homework', val: 0, color: '#4BC0C0' },
+        { id: 'work', name: '💼 Job', val: 0, color: '#9966FF' },
+        { id: 'studentorgs', name: '📣 Student Orgs & Clubs', val: 0, color: '#9B59B6' },
+        { id: 'commute', name: '🚗 Commute (walking and driving)', val: 0, color: '#E74C3C' },
+        { id: 'ready', name: '🚿 Getting Ready (getting ready for the day)', val: 0, color: '#F1948A' },
+        { id: 'meals', name: '🍕 Meals & Nutrition', val: 0, color: '#FF9F40' },
+        { id: 'social', name: '👥 Socializing', val: 0, color: '#34495E' },
+        { id: 'downtime', name: '📱 Downtime (TV or phone scrolling)', val: 0, color: '#1ABC9C' },
         { id: 'misc', name: '⚙️ Miscellaneous / Other', val: 0, color: '#7F8C8D' }
     ];
 
     const container = document.getElementById('slidersContainer');
     categories.forEach(cat => {
-        container.innerHTML += '<div class="slider-group"><div class="slider-label"><span class="label-text"><span class="color-dot" style="background-color: ' + cat.color + ';"></span>' + cat.name + '</span><span id="' + cat.id + '-val">' + cat.val + ' hrs</span></div><input type="range" id="' + cat.id + '" min="0" max="24" step="0.5" value="${cat.val}" oninput="updateTime()"></div>';
+        container.innerHTML += '<div class="slider-group"><div class="slider-label"><span class="label-text"><span class="color-dot" style="background-color: ' + cat.color + ';"></span>' + cat.name + '</span><span id="' + cat.id + '-val">' + cat.val + ' hrs</span></div><input type="range" id="' + cat.id + '" min="0" max="24" step="0.5" value="' + cat.val + '" oninput="updateTime()"></div>';
         
         const style = document.createElement('style');
         style.innerHTML = '#' + cat.id + '::-webkit-slider-thumb { background: ' + cat.color + ' !important; } #' + cat.id + '::-moz-range-thumb { background: ' + cat.color + ' !important; }';
